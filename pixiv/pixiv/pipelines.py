@@ -9,6 +9,7 @@ import os
 from scrapy.pipelines.images import ImagesPipeline
 from scrapy.utils.project import get_project_settings
 import shutil
+from pixiv.spiders.pixivspider import PixivspiderSpider
 
 
 class PixivPipeline(ImagesPipeline):
@@ -16,10 +17,12 @@ class PixivPipeline(ImagesPipeline):
     #     return item
     # 获取settings文件里设置的变量值
     IMAGES_STORE = get_project_settings().get("IMAGES_STORE")
+    pixiv_spider = PixivspiderSpider()
+    headers = pixiv_spider.headers
 
     def get_media_requests(self, item, info):
         img_url = item['img_url']
-        yield scrapy.Request(img_url)
+        yield scrapy.Request(url=img_url, headers=self.headers)
 
     def item_completed(self, results, item, info):
         image_path = [x['path'] for ok, x in results if ok]
